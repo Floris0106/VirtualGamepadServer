@@ -6,7 +6,6 @@ public abstract class ServerboundPacket
     {
 	    { 0x00, reader => new ConnectionRequestPacket(reader) },
 	    { 0x01, reader => new GamepadStatePacket(reader) },
-	    { 0xFF, _ => new ServerboundHeartbeatPacket()}
     };
     
     public static (byte, ServerboundPacket) Decode(byte[] bytes)

@@ -1,4 +1,5 @@
-﻿using GamepadServer.Emulation;
+﻿using System.Collections.Concurrent;
+using GamepadServer.Emulation;
 using GamepadServer.Net;
 
 #pragma warning disable CS8602
@@ -25,6 +26,7 @@ while (gamepadManager == null)
 }
 
 ConnectionManager? connectionManager = null;
+ConcurrentDictionary<byte, ulong> lastTimestamps = new();
 try
 {
     connectionManager = new(1055, (connectionId, packet, endPoint) =>
@@ -33,9 +35,9 @@ try
         {
             case ConnectionRequestPacket connectionRequest:
             {
-                if (connectionManager.AddConnection(connectionRequest.token, endPoint, out connectionId))
+                if (connectionManager.AddConnection(connectionRequest.Token, endPoint, out connectionId))
                 {
-                    Console.WriteLine($"Incoming connection ID: {connectionId}");
+                    Console.WriteLine($"Incoming connection from {endPoint.Address}, assigning ID: {connectionId}");
                     gamepadManager.AddGamepad(connectionId);
                 }
                 
@@ -44,12 +46,11 @@ try
             }
             case GamepadStatePacket gamepadState:
             {
+                if (lastTimestamps.TryGetValue(connectionId, out ulong lastTimestamp) && gamepadState.Timestamp < lastTimestamp)
+                    break;
+                
+                lastTimestamps[connectionId] = gamepadState.Timestamp;
                 gamepadManager.SetGamepadState(connectionId, gamepadState.State);
-                break;
-            }
-            case ServerboundHeartbeatPacket:
-            {
-                connectionManager.Send(connectionId, new ClientboundHeartbeatPacket());
                 break;
             }
         }

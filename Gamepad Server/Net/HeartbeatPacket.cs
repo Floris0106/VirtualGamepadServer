@@ -1,6 +1,6 @@
 ﻿namespace GamepadServer.Net;
 
-public class ClientboundHeartbeatPacket : ClientboundPacket
+public class HeartbeatPacket : ClientboundPacket
 {
 	public override byte Id => 0xFF;
 	

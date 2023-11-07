@@ -5,6 +5,7 @@ namespace GamepadServer.Net;
 public class GamepadStatePacket : ServerboundPacket
 {
 	public readonly GamepadState State;
+	public readonly ulong Timestamp;
 	
 	public GamepadStatePacket(BinaryReader reader)
 	{
@@ -30,5 +31,7 @@ public class GamepadStatePacket : ServerboundPacket
 		
 		State.LeftStick = new(reader.ReadSingle(), reader.ReadSingle());
 		State.RightStick = new(reader.ReadSingle(), reader.ReadSingle());
+		
+		Timestamp = reader.ReadUInt64();
 	}
 }

@@ -2,10 +2,10 @@
 
 public class ConnectionRequestPacket : ServerboundPacket
 {
-	public readonly Guid token;
+	public readonly Guid Token;
 	
 	public ConnectionRequestPacket(BinaryReader reader)
 	{
-		token = new(reader.ReadBytes(16));
+		Token = new(reader.ReadBytes(16));
 	}
 }
